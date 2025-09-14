@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full bg-white border-r border-gray-200">
     <!-- Logo -->
     <div class="p-4 border-b border-gray-200 flex justify-center">
         <a href="{{ route('dashboard') }}">
@@ -38,9 +38,11 @@
                     <a href="{{ route('questions.index') }}" class="underline-effect {{ request()->routeIs('questions.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                         Gérer le QCM
                     </a>
-                    {{-- 👇 LIEN AJOUTÉ 👇 --}}
                     <a href="{{ route('flights.validation.index') }}" class="underline-effect {{ request()->routeIs('flights.validation.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                         Valider les Vols
+                    </a>
+                    <a href="{{ route('pilots.index') }}" class="underline-effect {{ request()->routeIs('pilots.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        Gestion des pilotes
                     </a>
                 </div>
             </div>

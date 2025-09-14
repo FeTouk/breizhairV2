@@ -63,5 +63,13 @@ class TestController extends Controller
             return redirect('/')->with('error', 'Votre score est insuffisant. Votre inscription a été annulée. Vous pouvez vous réinscrire pour retenter.');
         }
     }
+
+    public function testCarbon()
+    {
+        $departure = \Carbon\Carbon::parse('10:00');
+        $arrival = \Carbon\Carbon::parse('11:00');
+        $duration = $arrival->diffInMinutes($departure);
+        dd($duration);
+    }
 }
 

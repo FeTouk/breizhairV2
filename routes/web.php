@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FlightReportController;
 use App\Http\Controllers\IvaoApiController;
 use App\Http\Controllers\FlightValidationController;
+use App\Http\Controllers\PilotManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,6 +98,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/flights', [FlightValidationController::class, 'index'])->name('flights.validation.index');
         Route::get('/admin/flights/{flight}', [FlightValidationController::class, 'show'])->name('flights.validation.show');
         Route::patch('/admin/flights/{flight}', [FlightValidationController::class, 'update'])->name('flights.validation.update');
+
+        // Routes pour la gestion des pilotes (sans les pages de création)
+        Route::resource('pilots', PilotManagementController::class)->except(['create', 'store']);
     });
 });
 

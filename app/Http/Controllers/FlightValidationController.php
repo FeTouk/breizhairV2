@@ -39,25 +39,12 @@ class FlightValidationController extends Controller
             'validation_comments' => 'nullable|string',
         ]);
 
-        // --- CORRECTION DU CALCUL DU TEMPS DE VOL ---
-        $departureTime = Carbon::parse($validated['departure_time']);
-        $arrivalTime = Carbon::parse($validated['arrival_time']);
-
-        // Si l'heure d'arrivée est antérieure à l'heure de départ,
-        // on suppose que le vol a traversé minuit et on ajoute un jour à l'arrivée.
-        if ($arrivalTime->lessThan($departureTime)) {
-            $arrivalTime->addDay();
-        }
-
-        $durationInMinutes = $arrivalTime->diffInMinutes($departureTime);
-        // --- FIN DE LA CORRECTION ---
-
-
         // Mise à jour du rapport de vol
         $flight->update([
             'status' => 'Validé',
             'nautical_miles' => $validated['nautical_miles'],
-            'flight_duration' => $durationInMinutes,
+            'departure_time' => $validated['departure_time'],
+            'arrival_time' => $validated['arrival_time'],
             'validated_by' => Auth::id(),
             'validation_comments' => $validated['validation_comments'],
         ]);
@@ -66,7 +53,7 @@ class FlightValidationController extends Controller
         $pilot = $flight->user;
         $pilot->increment('total_flights');
         $pilot->increment('total_nautical_miles', $validated['nautical_miles']);
-        $pilot->increment('total_flight_hours', $durationInMinutes); // On ajoute les minutes au total
+        $pilot->increment('total_flight_hours', $flight->flight_duration); // On ajoute les minutes au total
 
         return redirect()->route('flights.validation.index')->with('success', 'Le rapport de vol a été validé avec succès !');
     }

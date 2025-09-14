@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Flight extends Model
 {
@@ -32,6 +33,29 @@ class Flight extends Model
         'validation_comments',
         'status',
     ];
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($flight) {
+            if ($flight->departure_time && $flight->arrival_time) {
+                $departureTime = Carbon::parse($flight->departure_time);
+                $arrivalTime = Carbon::parse($flight->arrival_time);
+
+                if ($arrivalTime->lessThan($departureTime)) {
+                    $arrivalTime->addDay();
+                }
+
+                $flight->flight_duration = abs($arrivalTime->diffInMinutes($departureTime));
+            }
+        });
+    }
 
     /**
      * Définit la relation : un vol appartient à un utilisateur.
