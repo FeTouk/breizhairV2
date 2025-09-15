@@ -10,6 +10,7 @@ use App\Http\Controllers\FlightValidationController;
 use App\Http\Controllers\PilotManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,16 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $activePilots = User::where('status', 'active')->count();
+    $totalFlights = User::sum('total_flights');
+    $totalFlightHours = floor(User::sum('total_flight_hours') / 60);
+    $totalNauticalMiles = User::sum('total_nautical_miles');
+    return view('welcome', [
+        'activePilots' => $activePilots,
+        'totalFlights' => $totalFlights,
+        'totalFlightHours' => $totalFlightHours,
+        'totalNauticalMiles' => $totalNauticalMiles,
+    ]);
 });
 
 Route::get('/about', function () {
@@ -32,21 +42,21 @@ Route::get('/reglement', function () {
 Route::get('/badges', function () {
     $badges = [
         ['image' => 'contributeur.png', 'name' => 'Contributeur', 'description' => 'Badge accordé aux personnes ayant contribué significativement à la compagnie.'],
-        ['image' => 'badge-createur.png', 'name' => 'Créateur', 'description' => 'Badge accordé aux pilotes créant du contenu en ligne mettant en avant Breizh\'Air.'],
-        ['image' => 'badge-event-bzh.png', 'name' => 'Evènements Breizh\'Air', 'description' => 'Badge attribué aux pilotes ayant participé à au moins 10 événements Breizh\'Air.'],
-        ['image' => 'badge-event-ivao.png', 'name' => 'Evènements IVAO', 'description' => 'Badge attribué aux pilotes ayant participé à 10 évènements IVAO avec la compagnie Breizh\'Air.'],
+        ['image' => 'badge-createur.png', 'name' => 'Créateur', 'description' => 'Badge accordé aux pilotes créant du contenu en ligne mettant en avant Breizh\'.Air.'],
+        ['image' => 'badge-event-bzh.png', 'name' => 'Evènements Breizh\'.Air', 'description' => 'Badge attribué aux pilotes ayant participé à au moins 10 événements Breizh\'.Air.'],
+        ['image' => 'badge-event-ivao.png', 'name' => 'Evènements IVAO', 'description' => 'Badge attribué aux pilotes ayant participé à 10 évènements IVAO avec la compagnie Breizh\'.Air.'],
         ['image' => 'pole-event.png', 'name' => 'Pôle événement', 'description' => 'Badge accordé aux membres du pôle événement.'],
         ['image' => 'respo-event.png', 'name' => 'Responsable pôle événement', 'description' => 'Badge accordé au responsable du pôle événement.'],
         ['image' => 'pole-forma.png', 'name' => 'Pôle formation', 'description' => 'Badge accordé aux membres du pôle formation.'],
         ['image' => 'respo-forma.png', 'name' => 'Responsable pôle formation', 'description' => 'Badge accordé au responsable du pôle formation.'],
         ['image' => 'pole-pilote.png', 'name' => 'Pôle pilote', 'description' => 'Badge accordé aux membres du pôle pilote.'],
         ['image' => 'respo-pilote.png', 'name' => 'Responsable pôle pilote', 'description' => 'Badge accordé au responsable du pôle pilote.'],
-        ['image' => 'fondateur.png', 'name' => 'Fondateur', 'description' => 'Fondateur de Breizh\'Air.'],
-        ['image' => 'pdg.png', 'name' => 'PDG', 'description' => 'PDG de Breizh\'Air.'],
-        ['image' => 'webmaster.png', 'name' => 'Webmaster', 'description' => 'Webmaster de Breizh\'Air.'],
-        ['image' => '50vols.png', 'name' => '50 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 50 vols avec Breizh\'Air.'],
-        ['image' => '100vols.png', 'name' => '100 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 100 vols avec Breizh\'Air.'],
-        ['image' => '200vols.png', 'name' => '200 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 200 vols avec Breizh\'Air.'],
+        ['image' => 'fondateur.png', 'name' => 'Fondateur', 'description' => 'Fondateur de Breizh\'.Air.'],
+        ['image' => 'pdg.png', 'name' => 'PDG', 'description' => 'PDG de Breizh\'.Air.'],
+        ['image' => 'webmaster.png', 'name' => 'Webmaster', 'description' => 'Webmaster de Breizh\'.Air.'],
+        ['image' => '50vols.png', 'name' => '50 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 50 vols avec Breizh\'.Air.'],
+        ['image' => '100vols.png', 'name' => '100 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 100 vols avec Breizh\'.Air.'],
+        ['image' => '200vols.png', 'name' => '200 vols', 'description' => 'Badge accordé aux pilotes ayant effectué 200 vols avec Breizh\'.Air.'],
     ];
     return view('pages.badges', ['badges' => $badges]);
 });
@@ -107,8 +117,8 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Routes d'Authentification
+| Routes d\'Authentification
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
+require __DIR__."/auth.php";
 

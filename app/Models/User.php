@@ -24,6 +24,7 @@ class User extends Authenticatable
         'discord',
         'email',
         'password',
+        'role',
         'status',
         'callsign',
         'grade',

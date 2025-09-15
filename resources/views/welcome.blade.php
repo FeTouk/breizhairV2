@@ -42,19 +42,19 @@
     <div class="mt-16">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div class="bg-white p-6 rounded-lg shadow-lg text-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                <span class="block text-4xl font-bold text-[#17A4F6]">15</span>
+                <span class="block text-4xl font-bold text-[#17A4F6]">{{ $activePilots }}</span>
                 <span class="block mt-2 text-lg text-gray-600 font-medium">Pilotes actifs</span>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                <span class="block text-4xl font-bold text-[#17A4F6]">1,204</span>
+                <span class="block text-4xl font-bold text-[#17A4F6]">{{ number_format($totalFlights) }}</span>
                 <span class="block mt-2 text-lg text-gray-600 font-medium">Vols effectués</span>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                <span class="block text-4xl font-bold text-[#17A4F6]">5,890</span>
+                <span class="block text-4xl font-bold text-[#17A4F6]">{{ number_format($totalFlightHours) }}</span>
                 <span class="block mt-2 text-lg text-gray-600 font-medium">Heures de vol</span>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg text-center transform transition duration-300 hover:scale-105 hover:shadow-xl">
-                <span class="block text-4xl font-bold text-[#17A4F6]">345,678</span>
+                <span class="block text-4xl font-bold text-[#17A4F6]">{{ number_format($totalNauticalMiles) }}</span>
                 <span class="block mt-2 text-lg text-gray-600 font-medium">Nautiques parcourus</span>
             </div>
         </div>
@@ -82,7 +82,7 @@
     <div class="mt-16 bg-white rounded-lg shadow-xl overflow-hidden">
         <div class="flex flex-col md:flex-row items-center">
             <div class="w-full md:w-1/2">
-                <img src="https://breizhair.fr/img/photo_2.png" alt="Vue d'un cockpit d'avion" class="w-full h-full object-cover">
+                <img src="{{ asset('images/BZH_rade.png') }}" alt="Vue d'un cockpit d'avion" class="w-full h-full object-cover">
             </div>
             <div class="w-full md:w-1/2 p-8 lg:p-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">Notre compagnie</h2>
@@ -103,7 +103,7 @@
                 </p>
             </div>
             <div class="w-full md:w-1/2">
-                <img src="https://breizhair.fr/img/photo_site_1.png" alt="Paysage côtier de Bretagne" class="w-full h-full object-cover">
+                <img src="{{ asset('images/BHZ_golden_low.png') }}" alt="Paysage côtier de Bretagne" class="w-full h-full object-cover">
             </div>
         </div>
     </div>
@@ -233,7 +233,7 @@
                         if (lastTrack && typeof lastTrack.latitude === 'number' && typeof lastTrack.longitude === 'number') {
                             const icon = L.divIcon({
                                 html: `<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-8 w-8 text-blue-600\" fill=\"currentColor\" viewBox=\"0 0 20 20\" style=\"transform: rotate(${lastTrack.heading}deg);\">
-                                           <path d=\"M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z\" />
+                                           <path d=\"M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                                        </svg>`, 
                                 className: '',
                                 iconSize: [32, 32],
