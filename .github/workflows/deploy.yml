@@ -47,7 +47,7 @@ jobs:
           # Nom d'utilisateur FTP (à stocker dans les secrets)
           username: u704599247.aurelien
           # Mot de passe FTP (à stocker dans les secrets)
-          password: ${{ secrets.FTP_PASSWORD }}
+          password: /xFzt1T8uKjoJrX9
           # Le dossier de destination sur votre serveur FTP
           # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
           server-dir: /public_html/
