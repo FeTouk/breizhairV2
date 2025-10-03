@@ -1,45 +1,45 @@
 steps:
-# Étape 1 : Récupérer le code de votre dépôt
-- name: Checkout du code
-  uses: actions/checkout@v3
+  # Étape 1 : Récupérer le code de votre dépôt
+  - name: Checkout du code
+    uses: actions/checkout@v3
 
-# Étape 2 : Mettre en place l'environnement PHP
-- name: Configuration de PHP
-  uses: shivammathur/setup-php@v2
-  with:
-    php-version: '8.2' # Assurez-vous que cette version correspond à celle de votre projet
+  # Étape 2 : Mettre en place l'environnement PHP
+  - name: Configuration de PHP
+    uses: shivammathur/setup-php@v2
+    with:
+      php-version: '8.2' # Assurez-vous que cette version correspond à celle de votre projet
 
-# Étape 3 : Installer les dépendances Composer (sans les dépendances de développement)
-- name: Installation des dépendances Composer
-  run: composer install --optimize-autoloader --no-dev
+  # Étape 3 : Installer les dépendances Composer (sans les dépendances de développement)
+  - name: Installation des dépendances Composer
+    run: composer install --optimize-autoloader --no-dev
 
-# Étape 4 : Mettre en place l'environnement Node.js pour compiler les assets
-- name: Configuration de Node.js
-  uses: actions/setup-node@v3
-  with:
-    node-version: '18' # Ou la version que vous utilisez
+  # Étape 4 : Mettre en place l'environnement Node.js pour compiler les assets
+  - name: Configuration de Node.js
+    uses: actions/setup-node@v3
+    with:
+      node-version: '18' # Ou la version que vous utilisez
 
-# Étape 5 : Installer les dépendances NPM et compiler les fichiers CSS/JS
-- name: Installation des dépendances NPM et compilation
-  run: |
-    npm install
-    npm run build
+  # Étape 5 : Installer les dépendances NPM et compiler les fichiers CSS/JS
+  - name: Installation des dépendances NPM et compilation
+    run: |
+      npm install
+      npm run build
 
-# Étape 6 : Déployer les fichiers sur le serveur FTP
-- name: Déploiement FTP
-  uses: SamKirkland/FTP-Deploy-Action@4.3.3
-  with:
-    # Adresse de votre serveur FTP (à stocker dans les secrets)
-    server: ${{ secrets.FTP_SERVER }}
-    # Nom d'utilisateur FTP (à stocker dans les secrets)
-    username: ${{ secrets.FTP_USERNAME }}
-    # Mot de passe FTP (à stocker dans les secrets)
-    password: ${{ secrets.FTP_PASSWORD }}
-    # Le dossier de destination sur votre serveur FTP
-    # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
-    server-dir: /public_html/
-    # Exclure les fichiers et dossiers inutiles du déploiement
-    exclude: |
-      **/.git*
-      **/.git*/**
-      **/node_modules/**
+  # Étape 6 : Déployer les fichiers sur le serveur FTP
+  - name: Déploiement FTP
+    uses: SamKirkland/FTP-Deploy-Action@4.3.3
+    with:
+      # Adresse de votre serveur FTP (à stocker dans les secrets)
+      server: ${{ secrets.FTP_SERVER }}
+      # Nom d'utilisateur FTP (à stocker dans les secrets)
+      username: ${{ secrets.FTP_USERNAME }}
+      # Mot de passe FTP (à stocker dans les secrets)
+      password: ${{ secrets.FTP_PASSWORD }}
+      # Le dossier de destination sur votre serveur FTP
+      # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
+      server-dir: /chemin/vers/votre/dossier/
+      # Exclure les fichiers et dossiers inutiles du déploiement
+      exclude: |
+        **/.git*
+        **/.git*/**
+        **/node_modules/**
