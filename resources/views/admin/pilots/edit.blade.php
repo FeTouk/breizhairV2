@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" x-data="{ modalOpen: false }">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 md:p-8 text-gray-900">
@@ -51,7 +51,8 @@
                             <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
                                 <div>
                                     <label for="skycoins" class="block text-sm font-medium text-gray-700">SkyCoins</label>
-                                    <input type="number" name="skycoins" id="skycoins" value="{{ old('skycoins', $pilot->skycoins) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                    <input type="number" id="skycoins" value="{{ old('skycoins', $pilot->skycoins) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" disabled>
+                                    <button type="button" @click.prevent="modalOpen = true" class="mt-2 text-sm text-blue-600 hover:text-blue-800">Faire une opération</button>
                                 </div>
                             </div>
                         </div>
@@ -65,5 +66,29 @@
                 </div>
             </div>
         </div>
+
+        {{-- Modal --}}
+        <div x-show="modalOpen" @keydown.escape.window="modalOpen = false" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
+            <div @click.away="modalOpen = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Opération sur les SkyCoins</h3>
+                <form action="{{ route('pilots.skycoins.update', $pilot) }}" method="POST">
+                    @csrf
+                    <p class="mb-4">Solde actuel : <strong>{{ number_format($pilot->skycoins) }}</strong> SkyCoins</p>
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Montant</label>
+                        <input type="number" name="amount" id="amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required min="0">
+                    </div>
+                    <div class="mt-6 flex justify-between items-center space-x-2">
+                        <button type="submit" name="operation" value="subtract" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Retirer</button>
+                        <button type="submit" name="operation" value="add" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Ajouter</button>
+                        <button type="submit" name="operation" value="set" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Définir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </x-app-layout>

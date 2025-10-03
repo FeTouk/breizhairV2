@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <a class="underline-effect px-3 py-2 {{ Request::is('evenements') ? 'active' : '' }}" href="/evenements">Evènements</a>
+                <a class="underline-effect px-3 py-2 {{ Request::is('evenements*') ? 'active' : '' }}" href="{{ route('events.index') }}">Evènements</a>
                 
                 <div class="relative" x-data="{ dropdownOpen: false }">
                     <a @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false" class="underline-effect dropdown-toggle px-3 py-2 flex items-center {{ Request::is('staff', 'pilotes') ? 'active' : '' }}" href="#">
