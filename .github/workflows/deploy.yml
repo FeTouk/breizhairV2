@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           # Le dossier de destination sur votre serveur FTP
           # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
-          server-dir: /chemin/vers/votre/dossier/
+          server-dir: /public_html/
           # Exclure les fichiers et dossiers inutiles du déploiement
           exclude: |
             **/.git*
