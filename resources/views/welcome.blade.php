@@ -15,10 +15,10 @@
                     La compagnie aérienne qui vous emmène à la découverte de la Bretagne et d'autres destinations européennes.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-                    <a href="{{ route('register') }}" class="bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                    <a href="/register" class="btn btn-lg btn-info text-white">
                         Nous rejoindre
                     </a>
-                    <a href="/about" class="bg-transparent border-2 border-white text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 hover:bg-white hover:text-gray-800">
+                    <a href="/about" class="btn btn-lg btn-outline">
                         En savoir plus
                     </a>
                 </div>
@@ -118,7 +118,7 @@
                 </div>
                 <div class="mt-6 sm:mt-0">
                     {{-- 👇 MODIFICATION ICI 👇 --}}
-                    <a href="/rejoindre" class="bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    <a href="/register" class="btn btn-lg btn-info text-white">
                         Nous rejoindre
                     </a>
                 </div>

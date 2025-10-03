@@ -18,29 +18,30 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
                 {{-- Membre 1 --}}
                 <div class="flex flex-col items-center text-center">
-                    <img class="w-32 h-32 rounded-full object-cover mb-4 shadow-lg" src="{{ asset('images/aymericd.jpg') }}" alt="Photo de Aymeric D.">
+                    <img class="w-36 rounded-full" src="{{ asset('images/aymericd.jpg') }}" alt="Photo de Aymeric D.">
                     <p class="text-lg font-semibold text-gray-900">Aymeric D.</p>
                     <p class="text-md text-gray-700">CEO</p>
                     <a href="mailto:ceo@breizhair.fr" class="text-blue-600 hover:underline">ceo@breizhair.fr</a>
                 </div>
                 {{-- Membre 2 --}}
                 <div class="flex flex-col items-center text-center">
-                    <img class="w-32 h-32 rounded-full object-cover mb-4 shadow-lg" src="{{ asset('images/raphaell.jpg') }}" alt="Photo de Raphael L.">
-                    <p class="text-lg font-semibold text-gray-900">Raphael L.</p>
+                    <img class="w-36 rounded-full" src="{{ asset('images/honore.webp') }}" alt="Photo de Honoré B.">
+                    <p class="text-lg font-semibold text-gray-900">Honoré B.</p>
                     <p class="text-md text-gray-700">Pôle pilote</p>
                     <a href="mailto:pilote@breizhair.fr" class="text-blue-600 hover:underline">pilote@breizhair.fr</a>
                 </div>
                 {{-- Membre 3 --}}
                 <div class="flex flex-col items-center text-center">
-                    <img class="w-32 h-32 rounded-full object-cover mb-4 shadow-lg" src="{{ asset('images/aymericd.jpg') }}" alt="Photo de Aymeric D.">
-                    <p class="text-lg font-semibold text-gray-900">Aymeric D.</p>
-                    <p class="text-md text-gray-700">Pôle événements</p>
+                    <img class="w-36 rounded-full" src="{{ asset('images/aurelien.webp') }}" alt="Photo de Aurélien P.">
+                    <p class="text-lg font-semibold text-gray-900">Aurélien P.</p>
+                    <p class="text-md text-gray-700">Pôle événements & Pôle technique</p>
                     <a href="mailto:evenement@breizhair.fr" class="text-blue-600 hover:underline">evenement@breizhair.fr</a>
+                    <a href="mailto:support@breizhair.fr" class="text-blue-600 hover:underline">support@breizhair</a>D
                 </div>
                 {{-- Membre 4 --}}
                 <div class="flex flex-col items-center text-center">
-                    <img class="w-32 h-32 rounded-full object-cover mb-4 shadow-lg" src="{{ asset('images/enzol.jpg') }}" alt="Photo de Enzo L.">
-                    <p class="text-lg font-semibold text-gray-900">Enzo L.</p>
+                    <img class="w-36 rounded-full" src="{{ asset('images/user-solid.svg') }}" alt="Pole formation">
+                    <p class="text-lg font-semibold text-gray-900">Poste vacant</p>
                     <p class="text-md text-gray-700">Pôle formation</p>
                     <a href="mailto:formation@breizhair.fr" class="text-blue-600 hover:underline">formation@breizhair.fr</a>
                 </div>
@@ -58,7 +59,7 @@
                 Pôles de la compagnie
             </h2>
             <p class="text-xl text-gray-600 mb-12 text-center max-w-3xl mx-auto">
-                Afin de vous proposer les meilleurs services au sein de Breizh'air, notre staff est divisé en 3 pôles.
+                Afin de vous proposer les meilleurs services au sein de Breizh'air, notre staff est divisé en 4 pôles.
             </p>
 
             {{-- Grille des 3 pôles --}}
@@ -75,8 +76,8 @@
                             <p>Enfin, que serait une compagnie sans relations humaines ? Le pôle pilote s'attachera à répondre aux moindres de vos questions , et vous accompagnera pour vous offrir la meilleure expérience possible avec Breizh'air !</p>
                         `,
                         members: [
-                            { name: 'Raphael L.', role: 'Responsable Pôle Pilote' },
-                            { name: 'Membre B', role: 'Membre' },
+                            { name: 'Honoré B.', role: 'Responsable Pôle Pilote' },
+                            { name: 'Théophile L.', role: 'Membre' },
                         ] 
                     }" 
                     class="mt-4 bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-2 px-4 rounded transition duration-300 self-start">
@@ -96,7 +97,7 @@
                             <p>Enfin, ce pole gère les succès et badges que vous pourrez obtenir tout au long de votre expérience chez Breizh'air.</p>
                         `,
                         members: [
-                            { name: 'Aymeric D.', role: 'Responsable Pôle Événements' },
+                            { name: 'Aurélien P.', role: 'Responsable Pôle Événements' },
                             { name: 'Membre C', role: 'Membre' },
                         ] 
                     }" 

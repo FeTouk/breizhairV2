@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\SkyVectorApiController;
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\Admin\RouteManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -46,16 +47,16 @@ Route::get('/reglement', function () {
 
 Route::get('/badges', function () {
     $badges = [
-        ['image' => 'contributeur.png', 'name' => 'Contributeur', 'description' => "Badge accordé aux personnes ayant contribué significativement à la compagnie."],
+        ['image' => 'contributeur.png', 'name' => 'Contributeur', 'description' => 'Badge accordé aux personnes ayant contribué significativement à la compagnie.'],
         ['image' => 'badge-createur.png', 'name' => 'Créateur', 'description' => "Badge accordé aux pilotes créant du contenu en ligne mettant en avant Breizh'Air."],
         ['image' => 'badge-event-bzh.png', 'name' => "Evènements Breizh'Air", 'description' => "Badge attribué aux pilotes ayant participé à au moins 10 événements Breizh'Air."],
         ['image' => 'badge-event-ivao.png', 'name' => 'Evènements IVAO', 'description' => "Badge attribué aux pilotes ayant participé à 10 évènements IVAO avec la compagnie Breizh'Air."],
-        ['image' => 'pole-event.png', 'name' => 'Pôle événement', 'description' => "Badge accordé aux membres du pôle événement."],
-        ['image' => 'respo-event.png', 'name' => 'Responsable pôle événement', 'description' => "Badge accordé au responsable du pôle événement."],
-        ['image' => 'pole-forma.png', 'name' => 'Pôle formation', 'description' => "Badge accordé aux membres du pôle formation."],
-        ['image' => 'respo-forma.png', 'name' => 'Responsable pôle formation', 'description' => "Badge accordé au responsable du pôle formation."],
-        ['image' => 'pole-pilote.png', 'name' => 'Pôle pilote', 'description' => "Badge accordé aux membres du pôle pilote."],
-        ['image' => 'respo-pilote.png', 'name' => 'Responsable pôle pilote', 'description' => "Badge accordé au responsable du pôle pilote."],
+        ['image' => 'pole-event.png', 'name' => 'Pôle événement', 'description' => 'Badge accordé aux membres du pôle événement.'],
+        ['image' => 'respo-event.png', 'name' => 'Responsable pôle événement', 'description' => 'Badge accordé au responsable du pôle événement.'],
+        ['image' => 'pole-forma.png', 'name' => 'Pôle formation', 'description' => 'Badge accordé aux membres du pôle formation.'],
+        ['image' => 'respo-forma.png', 'name' => 'Responsable pôle formation', 'description' => 'Badge accordé au responsable du pôle formation.'],
+        ['image' => 'pole-pilote.png', 'name' => 'Pôle pilote', 'description' => 'Badge accordé aux membres du pôle pilote.'],
+        ['image' => 'respo-pilote.png', 'name' => 'Responsable pôle pilote', 'description' => 'Badge accordé au responsable du pôle pilote.'],
         ['image' => 'fondateur.png', 'name' => 'Fondateur', 'description' => "Fondateur de Breizh'Air."],
         ['image' => 'pdg.png', 'name' => 'PDG', 'description' => "PDG de Breizh'Air."],
         ['image' => 'webmaster.png', 'name' => 'Webmaster', 'description' => "Webmaster de Breizh'Air."],
@@ -108,7 +109,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/flights/{flight}', [FlightValidationController::class, 'show'])->name('flights.validation.show');
         Route::patch('/admin/flights/{flight}', [FlightValidationController::class, 'update'])->name('flights.validation.update');
         Route::resource('pilots', PilotManagementController::class)->except(['create', 'store']);
-        Route::resource('admin/routes', \App\Http\Controllers\Admin\RouteManagementController::class)->names('admin.routes');
+        Route::resource('admin/routes', RouteManagementController::class)->names('admin.routes');
+        Route::patch('/admin/routes/{route}/airac', [RouteManagementController::class, 'updateAirac'])->name('admin.routes.updateAirac');
         Route::resource('admin/events', EventManagementController::class)->names('admin.events');
     });
 });
@@ -120,3 +122,4 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+

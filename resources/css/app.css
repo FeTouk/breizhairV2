@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Style pour la barre sous les liens du menu public */
+    .underline-effect {
+        position: relative;
+        padding-bottom: 0.5rem;
+        cursor: pointer;
+    }
+    .underline-effect::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 3px;
+        background-color: #17A4F6;
+        transition: width 0.3s ease-in-out;
+    }
+    .underline-effect:hover::after {
+        width: 100%;
+        background-color: #17A4F6;
+    }
+    .underline-effect.active::after {
+        width: 100%;
+        background-color: #6c757d;
+    }
+    .underline-effect.active:hover::after {
+        background-color: #6c757d;
+    }
+
+    /* Personnalisation des liens dans les blocs de texte "prose" */
+    .prose a {
+        @apply text-blue-600 underline hover:text-blue-800;
+    }
+
+    /* Classe pour la police spéciale dyslexie */
+    .font-dyslexia {
+        font-family: 'Atkinson Hyperlegible', sans-serif !important;
+    }
+}

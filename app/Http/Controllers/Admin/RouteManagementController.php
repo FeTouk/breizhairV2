@@ -9,15 +9,40 @@ use Illuminate\Http\Request;
 class RouteManagementController extends Controller
 {
     /**
-     * Affiche la liste de toutes les lignes.
+     * Affiche la liste des lignes de la compagnie, potentiellement filtrée.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // On trie par ID car 'flight_number' n'existe plus
-        $routes = FlightRoute::orderBy('id')->get();
-        // On récupère l'identifiant du cycle AIRAC en cours pour l'affichage
+        $query = FlightRoute::query();
         $currentAirac = getCurrentAiracIdentifier();
-        return view('admin.routes.index', compact('routes', 'currentAirac'));
+
+        if ($request->filled('line_type')) {
+            $query->where('line_type', $request->line_type);
+        }
+        if ($request->filled('aircraft_type')) {
+            $query->where('aircraft_type', $request->aircraft_type);
+        }
+        if ($request->filled('airac_status')) {
+            if ($request->airac_status === 'valid') {
+                $query->where('validated_airac', $currentAirac);
+            } elseif ($request->airac_status === 'expired') {
+                $query->where(function ($q) use ($currentAirac) {
+                    $q->where('validated_airac', '!=', $currentAirac)->orWhereNull('validated_airac');
+                });
+            }
+        }
+        
+        $routes = $query->orderBy('id')->get();
+        
+        // On récupère spécifiquement la liste des routes qui ne sont pas à jour pour le modal
+        $routesToValidate = FlightRoute::where('validated_airac', '!=', $currentAirac)
+            ->orWhereNull('validated_airac')
+            ->get();
+
+        $lineTypes = ['Régulière', 'Saisonnière', 'Evenement', 'Temporaire'];
+        $aircraftTypes = ['Local', 'Régional', 'Moyen courrier', 'Long courrier'];
+
+        return view('admin.routes.index', compact('routes', 'currentAirac', 'lineTypes', 'aircraftTypes', 'routesToValidate'));
     }
 
     /**
@@ -25,7 +50,6 @@ class RouteManagementController extends Controller
      */
     public function create()
     {
-        // On récupère la liste des cycles AIRAC pour le menu déroulant
         $airacCycles = getAiracData();
         return view('admin.routes.create', compact('airacCycles'));
     }
@@ -36,8 +60,8 @@ class RouteManagementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'aircraft_type' => 'nullable|string',
             'line_type' => 'required|string',
+            'aircraft_type' => 'nullable|string',
             'departure_icao' => 'required|string|size:4|uppercase',
             'arrival_icao' => 'required|string|size:4|uppercase',
             'route_string' => 'nullable|string',
@@ -54,7 +78,6 @@ class RouteManagementController extends Controller
      */
     public function edit(FlightRoute $route)
     {
-        // On passe les données de la route ET la liste des cycles AIRAC à la vue
         $airacCycles = getAiracData();
         return view('admin.routes.edit', compact('route', 'airacCycles'));
     }
@@ -65,8 +88,8 @@ class RouteManagementController extends Controller
     public function update(Request $request, FlightRoute $route)
     {
         $validated = $request->validate([
-            'aircraft_type' => 'nullable|string',
             'line_type' => 'required|string',
+            'aircraft_type' => 'nullable|string',
             'departure_icao' => 'required|string|size:4|uppercase',
             'arrival_icao' => 'required|string|size:4|uppercase',
             'route_string' => 'nullable|string',
@@ -85,6 +108,24 @@ class RouteManagementController extends Controller
     {
         $route->delete();
         return redirect()->route('admin.routes.index')->with('success', 'La ligne a été supprimée avec succès.');
+    }
+
+    /**
+     * Met à jour le statut AIRAC d'une route via une requête AJAX depuis le modal.
+     */
+    public function updateAirac(Request $request, FlightRoute $route)
+    {
+        $validated = $request->validate([
+            'action' => 'required|in:validate,invalidate',
+        ]);
+
+        if ($validated['action'] === 'validate') {
+            $route->update(['validated_airac' => getCurrentAiracIdentifier()]);
+        } elseif ($validated['action'] === 'invalidate') {
+            $route->update(['validated_airac' => null]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Statut de la route mis à jour.']);
     }
 }
 
