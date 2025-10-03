@@ -45,7 +45,7 @@ jobs:
           # Adresse de votre serveur FTP (à stocker dans les secrets)
           server: 147.93.88.244
           # Nom d'utilisateur FTP (à stocker dans les secrets)
-          username: ${{ secrets.FTP_USERNAME }}
+          username: u704599247.aurelien
           # Mot de passe FTP (à stocker dans les secrets)
           password: ${{ secrets.FTP_PASSWORD }}
           # Le dossier de destination sur votre serveur FTP
