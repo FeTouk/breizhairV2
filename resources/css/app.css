@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    :root {
-        --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-            'Segoe UI Symbol', 'Noto Color Emoji';
-    }
-}
-
 @layer components {
     /* Style pour la barre sous les liens du menu public */
     .underline-effect {
@@ -49,4 +42,3 @@
         font-family: 'Atkinson Hyperlegible', sans-serif !important;
     }
 }
-

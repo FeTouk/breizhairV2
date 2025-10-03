@@ -1,34 +1,43 @@
 <?php
 
-    use Illuminate\Database\Migrations\Migration;
-    use Illuminate\Database\Schema\Blueprint;
-    use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-    return new class extends Migration
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        /**
-         * Run the migrations.
-         */
-        public function up(): void
-        {
-            Schema::table('users', function (Blueprint $table) {
-                // On change les colonnes pour qu'elles acceptent des nombres signés (positifs et négatifs)
-                $table->bigInteger('total_flight_hours')->signed()->change();
-                $table->bigInteger('total_nautical_miles')->signed()->change();
-                $table->integer('skycoins')->signed()->change();
-            });
-        }
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('grade')->default('Apprenti pilote')->after('callsign');
+            $table->string('current_airport', 4)->default('LFRB')->after('grade');
+            
+            // On ajoute une valeur par défaut à toutes les statistiques
+            // et on met 1000 pour les skycoins comme demandé
+            $table->integer('skycoins')->default(1000)->after('current_airport');
+            $table->bigInteger('total_flight_hours')->default(0)->after('skycoins');
+            $table->integer('total_flights')->default(0)->after('total_flight_hours');
+            $table->bigInteger('total_nautical_miles')->default(0)->after('total_flights');
+        });
+    }
 
-        /**
-         * Reverse the migrations.
-         */
-        public function down(): void
-        {
-            Schema::table('users', function (Blueprint $table) {
-                // On remet les colonnes en non-signé si on annule la migration
-                $table->bigInteger('total_flight_hours')->unsigned()->change();
-                $table->bigInteger('total_nautical_miles')->unsigned()->change();
-                $table->integer('skycoins')->unsigned()->change();
-            });
-        }
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn([
+                'grade',
+                'current_airport',
+                'skycoins',
+                'total_flight_hours',
+                'total_flights',
+                'total_nautical_miles',
+            ]);
+        });
+    }
 };

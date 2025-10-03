@@ -25,7 +25,8 @@ class IvaoApiController extends Controller
         $whazzupUrl = 'https://api.ivao.aero/v2/tracker/whazzup';
 
         try {
-            $response = Http::get($whazzupUrl);
+            $apiKey = config('services.ivao.api_key');
+            $response = Http::withHeaders(array_filter(['apiKey' => $apiKey]))->get($whazzupUrl);
 
             if ($response->failed()) {
                 return response()->json(['error' => 'Impossible de contacter l\'API IVAO pour le moment.'], 500);
@@ -64,6 +65,40 @@ class IvaoApiController extends Controller
         } catch (\Exception $e) {
             // En cas d\'erreur inattendue (ex: format de l\'API qui change)
             return response()->json(['error' => 'Erreur lors de la récupération des données de vol.'], 500);
+        }
+    }
+
+    public function testIvaoVid($vid)
+    {
+        $whazzupUrl = 'https://api.ivao.aero/v2/tracker/whazzup';
+
+        try {
+            $apiKey = config('services.ivao.api_key');
+            $response = Http::withHeaders(array_filter(['apiKey' => $apiKey]))->get($whazzupUrl);
+
+            if ($response->failed()) {
+                return response()->json(['error' => 'Impossible de contacter l\'API IVAO pour le moment.'], 500);
+            }
+
+            $pilots = $response->json()['clients']['pilots'] ?? [];
+
+            $userFlight = collect($pilots)
+                ->where('userId', $vid)
+                ->first();
+
+            if (!$userFlight) {
+                return response()->json(['error' => 'Aucun vol trouvé pour ce VID sur le réseau.'], 404);
+            }
+
+            return response()->json([
+                'vid' => $userFlight['userId'],
+                'callsign' => $userFlight['callsign'],
+                'departure' => $userFlight['flightPlan']['departureId'] ?? '',
+                'arrival' => $userFlight['flightPlan']['arrivalId'] ?? '',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erreur lors de la récupération des données de vol.', 'message' => $e->getMessage()], 500);
         }
     }
 }

@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <a class="underline-effect px-3 py-2 {{ Request::is('evenements') ? 'active' : '' }}" href="/evenements">Evènements</a>
+                <a class="underline-effect px-3 py-2 {{ Request::is('evenements*') ? 'active' : '' }}" href="{{ route('events.index') }}">Evènements</a>
                 
                 <div class="relative" x-data="{ dropdownOpen: false }">
                     <a @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false" class="underline-effect dropdown-toggle px-3 py-2 flex items-center {{ Request::is('staff', 'pilotes') ? 'active' : '' }}" href="#">
@@ -44,9 +44,9 @@
                 <a class="underline-effect px-3 py-2 {{ Request::is('contact') ? 'active' : '' }}" href="/contact">Contact</a>
                 
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="ml-4 bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-2 px-4 rounded transition duration-300">Mon Espace Pilote</a>
+                    <a href="{{ url('/dashboard') }}" class="btn btn-info text-white">Mon Espace Pilote</a>
                 @else
-                    <a href="{{ route('login') }}" class="ml-4 bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-2 px-4 rounded transition duration-300">Espace Pilote</a>
+                    <a href="{{ route('login') }}" class="btn btn-info text-white">Espace Pilote</a>
                 @endauth
                 
                 <div class="ml-4">

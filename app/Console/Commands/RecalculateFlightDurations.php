@@ -44,21 +44,8 @@ class RecalculateFlightDurations extends Command
 
         foreach ($flightsToFix as $flight) {
             if ($flight->departure_time && $flight->arrival_time) {
-                $departureTime = Carbon::parse($flight->departure_time);
-                $arrivalTime = Carbon::parse($flight->arrival_time);
-
-                if ($arrivalTime->lessThan($departureTime)) {
-                    $arrivalTime->addDay();
-                }
-
-                $newDuration = $arrivalTime->diffInMinutes($departureTime);
-
-                // Update only if the duration changes
-                if ($flight->flight_duration !== $newDuration) {
-                    $flight->flight_duration = $newDuration;
-                    $flight->save();
-                    $fixedCount++;
-                }
+                $flight->touch(); // This will trigger the saving event and recalculate the duration
+                $fixedCount++;
             }
             $progressBar->advance();
         }

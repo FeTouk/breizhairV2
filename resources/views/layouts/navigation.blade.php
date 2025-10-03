@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full bg-white border-r border-gray-200">
     <!-- Logo -->
     <div class="p-4 border-b border-gray-200 flex justify-center">
         <a href="{{ route('dashboard') }}">
@@ -17,6 +17,10 @@
         <a href="{{ route('flights.index') }}" class="underline-effect {{ request()->routeIs('flights.index') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
             Mes vols
         </a>
+        {{-- Lien vers la page des lignes pour les pilotes --}}
+        <a href="{{ route('routes.index') }}" class="underline-effect {{ request()->routeIs('routes.index') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+            Nos Lignes
+        </a>
         <a href="#" class="underline-effect text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
             Flotte
         </a>
@@ -26,21 +30,27 @@
         <a href="#" class="underline-effect text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
             Formation
         </a>
-        <a href="#" class="underline-effect text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md">
-            Evènements
-        </a>
-
-        {{-- Section Administration (visible uniquement par les admins) --}}
-        @if (Auth::user()->role == 'admin')
+        
+        {{-- SECTION ADMINISTRATION (VISIBLE UNIQUEMENT PAR LES ADMINS) --}}
+        @if (Auth::check() && Auth::user()->role == 'admin')
             <div class="pt-4">
                 <h3 class="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administration</h3>
                 <div class="mt-1 space-y-1">
                     <a href="{{ route('questions.index') }}" class="underline-effect {{ request()->routeIs('questions.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                         Gérer le QCM
                     </a>
-                    {{-- 👇 LIEN AJOUTÉ 👇 --}}
                     <a href="{{ route('flights.validation.index') }}" class="underline-effect {{ request()->routeIs('flights.validation.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
                         Valider les Vols
+                    </a>
+                    <a href="{{ route('pilots.index') }}" class="underline-effect {{ request()->routeIs('pilots.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        Gestion des pilotes
+                    </a>
+                    <a href="{{ route('admin.events.index') }}" class="underline-effect {{ request()->routeIs('admin.events.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        Gestion des Événements
+                    </a>
+                    {{-- Lien vers la gestion des lignes pour les admins --}}
+                    <a href="{{ route('admin.routes.index') }}" class="underline-effect {{ request()->routeIs('admin.routes.*') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                        Gestion des Lignes
                     </a>
                 </div>
             </div>

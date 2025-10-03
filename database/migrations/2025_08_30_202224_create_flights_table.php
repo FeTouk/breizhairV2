@@ -13,25 +13,21 @@ return new class extends Migration
     {
         Schema::create('flights', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Lien vers l'utilisateur
-            
-            // --- Champs remplis par le pilote ---
-            $table->string('departure_icao', 4); // OACI Départ
-            $table->string('arrival_icao', 4);   // OACI Arrivée
-            $table->date('flight_date');         // Date du vol
-            $table->text('comments')->nullable(); // Commentaire du pilote
-            $table->boolean('is_breizhair_event')->default(false); // Case "Evenement Breizh'Air"
-            $table->boolean('is_ivao_event')->default(false);      // Case "evenement IVAO"
-            $table->string('status')->default('En attente'); // Statut : En attente, Validé, Refusé
-
-            // --- Champs remplis par les admins lors de la validation ---
-            $table->unsignedInteger('nautical_miles')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('departure_icao', 4);
+            $table->string('arrival_icao', 4);
+            $table->date('flight_date');
+            $table->text('comments')->nullable();
+            $table->text('route')->nullable();
             $table->time('departure_time')->nullable();
             $table->time('arrival_time')->nullable();
-            $table->string('flight_time')->nullable(); // ex: "1h 35m"
-            $table->foreignId('validator_id')->nullable()->constrained('users')->onDelete('set null'); // Lien vers l'admin validateur
-            $table->text('admin_remarks')->nullable(); // Remarques de l'admin
-
+            $table->boolean('is_breizhair_event')->default(false);
+            $table->boolean('is_ivao_event')->default(false);
+            $table->string('status')->default('En attente');
+            $table->integer('nautical_miles')->nullable();
+            $table->integer('flight_duration')->nullable(); // En minutes
+            $table->foreignId('validated_by')->nullable()->constrained('users');
+            $table->text('validation_comments')->nullable();
             $table->timestamps();
         });
     }
@@ -44,4 +40,3 @@ return new class extends Migration
         Schema::dropIfExists('flights');
     }
 };
-

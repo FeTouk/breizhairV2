@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('flights', function (Blueprint $table) {
-            // Ajoute une colonne pour stocker les remarques de l'admin
-            $table->text('validation_comments')->nullable()->after('validated_by');
+        Schema::table('routes', function (Blueprint $table) {
+            $table->dropColumn(['distance_nm', 'estimated_duration_minutes']);
         });
     }
 
@@ -22,8 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('flights', function (Blueprint $table) {
-            $table->dropColumn('validation_comments');
+        Schema::table('routes', function (Blueprint $table) {
+            $table->integer('distance_nm')->nullable();
+            $table->integer('estimated_duration_minutes')->nullable();
         });
     }
 };
