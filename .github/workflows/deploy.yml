@@ -1,3 +1,20 @@
+Nom du workflow qui apparaîtra dans l'onglet "Actions" de votre dépôt GitHub
+
+name: Déploiement FTP
+Événement déclencheur : se lance à chaque "push" sur la branche "main"
+
+on:
+push:
+branches:
+- main
+
+jobs:
+ftp-deploy:
+# Nom du job
+name: Déploiement des fichiers sur le serveur FTP
+# Le type de machine sur laquelle le job va s'exécuter
+runs-on: ubuntu-latest
+
 steps:
 # Étape 1 : Récupérer le code de votre dépôt
 - name: Checkout du code
@@ -11,6 +28,7 @@ steps:
 
 # Étape 3 : Installer les dépendances Composer (sans les dépendances de développement)
 - name: Installation des dépendances Composer
+  # 👇 CORRECTION ICI : --no-dev devient --no-dev 👇
   run: composer install --optimize-autoloader --no-dev
 
 # Étape 4 : Mettre en place l'environnement Node.js pour compiler les assets
@@ -37,9 +55,10 @@ steps:
     password: ${{ secrets.FTP_PASSWORD }}
     # Le dossier de destination sur votre serveur FTP
     # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
-    server-dir: /public_html
+    server-dir: /public_html/
     # Exclure les fichiers et dossiers inutiles du déploiement
     exclude: |
       **/.git*
       **/.git*/**
       **/node_modules/**
+
