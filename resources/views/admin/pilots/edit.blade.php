@@ -73,7 +73,8 @@
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Opération sur les SkyCoins</h3>
                 <form action="{{ route('pilots.skycoins.update', $pilot) }}" method="POST">
                     @csrf
-                    <p class="mb-4">Solde actuel : <strong>{{ number_format($pilot->skycoins) }}</strong> SkyCoins</p>
+                    @method('PATCH')
+                    <p class="mb-4 text-gray-900">Solde actuel : <strong>{{ number_format($pilot->skycoins) }}</strong> SkyCoins</p>
                     <div>
                         <label for="amount" class="block text-sm font-medium text-gray-700">Montant</label>
                         <input type="number" name="amount" id="amount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required min="0">

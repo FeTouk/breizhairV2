@@ -37,26 +37,12 @@ class PilotManagementController extends Controller
             'role' => 'required|in:user,admin',
             'status' => 'required|in:pending,active,inactive',
             'grade' => 'required|string',
-            'skycoins' => 'required|integer',
+            'skycoins' => 'required|integer|min:0',
         ]);
 
-        $pilot->first_name = $validated['first_name'];
-        $pilot->last_name = $validated['last_name'];
-        $pilot->callsign = $validated['callsign'];
-        $pilot->role = $validated['role'];
-        $pilot->status = $validated['status'];
-        $pilot->grade = $validated['grade'];
-        $pilot->skycoins = $validated['skycoins'];
-        
-        $isSaved = $pilot->save();
+        $pilot->update($validated);
 
-        dd($isSaved, $pilot); // Debugging line
-
-        if ($isSaved) {
-            return redirect()->route('pilots.index')->with('success', 'Le profil du pilote a été mis à jour avec succès.');
-        } else {
-            return redirect()->route('pilots.edit', $pilot)->with('error', 'La mise à jour a échoué. Un événement système a peut-être annulé l\'opération.');
-        }
+        return redirect()->route('pilots.index')->with('success', 'Le profil du pilote a été mis à jour avec succès.');
     }
 
     /**
@@ -69,6 +55,9 @@ class PilotManagementController extends Controller
         return redirect()->route('pilots.index')->with('success', 'Le pilote a été supprimé avec succès.');
     }
 
+    /**
+     * Met à jour les SkyCoins d'un pilote (ajouter, soustraire ou définir une valeur).
+     */
     public function updateSkycoins(Request $request, User $pilot)
     {
         $validated = $request->validate([
@@ -83,19 +72,15 @@ class PilotManagementController extends Controller
                 $pilot->skycoins += $amount;
                 break;
             case 'subtract':
-                $pilot->skycoins -= $amount;
+                $pilot->skycoins = max(0, $pilot->skycoins - $amount); // Ne pas descendre en dessous de 0
                 break;
             case 'set':
                 $pilot->skycoins = $amount;
                 break;
         }
 
-        $isSaved = $pilot->save();
+        $pilot->save();
 
-        if ($isSaved) {
-            return redirect()->route('pilots.edit', $pilot)->with('success', 'Les SkyCoins ont été mis à jour.');
-        } else {
-            return redirect()->route('pilots.edit', $pilot)->with('error', 'La mise à jour des SkyCoins a échoué (opération annulée).');
-        }
+        return redirect()->route('pilots.edit', $pilot)->with('success', 'Les SkyCoins ont été mis à jour avec succès.');
     }
 }

@@ -108,9 +108,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/flights', [FlightValidationController::class, 'index'])->name('flights.validation.index');
         Route::get('/admin/flights/{flight}', [FlightValidationController::class, 'show'])->name('flights.validation.show');
         Route::patch('/admin/flights/{flight}', [FlightValidationController::class, 'update'])->name('flights.validation.update');
+        
+        // Routes de gestion des pilotes
         Route::resource('pilots', PilotManagementController::class)->except(['create', 'store']);
+        Route::patch('/pilots/{pilot}/skycoins', [PilotManagementController::class, 'updateSkycoins'])->name('pilots.skycoins.update');
+        
+        // Routes de gestion des routes
         Route::resource('admin/routes', RouteManagementController::class)->names('admin.routes');
         Route::patch('/admin/routes/{route}/airac', [RouteManagementController::class, 'updateAirac'])->name('admin.routes.updateAirac');
+        
+        // Routes de gestion des événements
         Route::resource('admin/events', EventManagementController::class)->names('admin.events');
     });
 });
@@ -122,4 +129,3 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
-
