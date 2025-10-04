@@ -43,11 +43,11 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           # Adresse de votre serveur FTP (à stocker dans les secrets)
-          server: 147.93.88.244
+          server: ${{ secrets.FTP_SERVER }}
           # Nom d'utilisateur FTP (à stocker dans les secrets)
-          username: u704599247.aurelien
+          username: ${{ secrets.FTP_USERNAME }}
           # Mot de passe FTP (à stocker dans les secrets)
-          password: /xFzt1T8uKjoJrX9
+          password: ${{ secrets.FTP_PASSWORD }}
           # Le dossier de destination sur votre serveur FTP
           # Exemple : '/public_html/breizhair/' ou '/www/breizhair/'
           server-dir: /public_html/
