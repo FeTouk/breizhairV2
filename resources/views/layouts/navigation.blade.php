@@ -65,9 +65,9 @@
             <x-responsive-nav-link :href="route('admin.events.index')" :active="request()->routeIs('admin.events.*')">
                 Gestion des Événements
             </x-responsive-nav-link>
-            {{-- <x-responsive-nav-link :href="route('admin.logs.index')" :active="request()->routeIs('admin.logs.index')">
+            <x-responsive-nav-link :href="route('admin.logs.index')" :active="request()->routeIs('admin.logs.index')">
                 Journal d'Activité
-            </x-responsive-nav-link> --}}
+            </x-responsive-nav-link>
         </div>
     @endif
 
