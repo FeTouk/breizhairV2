@@ -136,10 +136,9 @@
             </div>
         </div>
 
-        {{-- MODAL POUR LA VALIDATION DES ROUTES --}}
+        {{-- NOUVEAU MODAL POUR LA VALIDATION DES ROUTES --}}
         <div class="modal" :class="{'modal-open': validationOpen}">
-            <div class="modal-box w-11/12 max-w-2xl relative"> {{-- Ajout de "relative" pour positionner la croix --}}
-                {{-- 👇 NOUVEAU BOUTON DE FERMETURE (CROIX) 👇 --}}
+            <div class="modal-box w-11/12 max-w-2xl relative">
                 <button @click="validationOpen = false" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 
                 <template x-if="currentRoute">
@@ -158,7 +157,6 @@
                             <span x-show="copied" class="text-xs text-success mt-1" x-transition>Copié !</span>
                         </div>
 
-                        {{-- 👇 NOUVEAU LIEN VERS EUROCONTROL 👇 --}}
                         <div class="mt-4 text-xs">
                             <a href="https://www.public.nm.eurocontrol.int/PUBPORTAL/gateway/spec/index.html" target="_blank" rel="noopener noreferrer" class="link link-info">
                                 Ouvrir le validateur Eurocontrol (IFPS)
@@ -184,13 +182,12 @@
         </div>
     </div>
 
-    {{-- Script Alpine.js pour la logique du modal de validation --}}
     <script>
     function validationModal(config) {
         return {
             routes: config.routes,
             validationOpen: false,
-            openFilterModal: false, // Ajout pour gérer les deux modaux
+            openFilterModal: false,
             currentIndex: 0,
             currentRoute: null,
             copied: false,
@@ -206,12 +203,11 @@
                 if (this.currentIndex < this.routes.length) {
                     this.currentRoute = this.routes[this.currentIndex];
                 } else {
-                    this.currentRoute = null; // Indique la fin de la validation
+                    this.currentRoute = null;
                 }
             },
             async handleAction(action) {
                 if (!this.currentRoute) return;
-
                 const routeId = this.currentRoute.id;
                 
                 if (action !== 'postpone') {

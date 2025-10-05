@@ -164,6 +164,7 @@ if (!function_exists('getAirportName')) {
             'LFTF' => 'Cuers-Pierrefeu',
             'LFTW' => 'Nîmes-Garons',
             'LFTZ' => 'La Môle - Saint-Tropez',
+            'LFOB' => 'Paris-Beauvais',
 
             // Royaume-Uni
             'EGLL' => 'Londres-Heathrow',

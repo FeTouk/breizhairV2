@@ -14,6 +14,7 @@ use App\Http\Controllers\RouteController;
 use App\Http\Controllers\SkyVectorApiController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\Admin\RouteManagementController;
+use App\Http\Controllers\Admin\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -119,6 +120,9 @@ Route::middleware('auth')->group(function () {
         
         // Routes de gestion des événements
         Route::resource('admin/events', EventManagementController::class)->names('admin.events');
+
+        // Route pour l'affichage des logs
+        Route::get('/admin/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
     });
 });
 
