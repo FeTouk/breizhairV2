@@ -29,7 +29,8 @@
         },
         "files": [
             "app/Helpers/AirportHelper.php",
-            "app/Helpers/AiracHelper.php"
+            "app/Helpers/AiracHelper.php",
+            "app/Helpers/Log.php"
         ]
     },
     "autoload-dev": {

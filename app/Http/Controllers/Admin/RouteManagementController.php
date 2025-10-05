@@ -69,7 +69,9 @@ class RouteManagementController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
-        FlightRoute::create($validated);
+        $route = FlightRoute::create($validated);
+        log_activity($route, 'Création de la ligne ' . $route->departure_icao . ' -> ' . $route->arrival_icao);
+
         return redirect()->route('admin.routes.index')->with('success', 'La ligne a été créée avec succès.');
     }
 
@@ -98,6 +100,8 @@ class RouteManagementController extends Controller
         ]);
 
         $route->update($validated);
+        log_activity($route, 'Mise à jour de la ligne ' . $route->departure_icao . ' -> ' . $route->arrival_icao);
+
         return redirect()->route('admin.routes.index')->with('success', 'La ligne a été mise à jour avec succès.');
     }
 
@@ -106,7 +110,9 @@ class RouteManagementController extends Controller
      */
     public function destroy(FlightRoute $route)
     {
+        log_activity($route, 'Suppression de la ligne ' . $route->departure_icao . ' -> ' . $route->arrival_icao);
         $route->delete();
+        
         return redirect()->route('admin.routes.index')->with('success', 'La ligne a été supprimée avec succès.');
     }
 
@@ -121,8 +127,10 @@ class RouteManagementController extends Controller
 
         if ($validated['action'] === 'validate') {
             $route->update(['validated_airac' => getCurrentAiracIdentifier()]);
+            log_activity($route, 'Validation AIRAC de la ligne ' . $route->departure_icao . ' -> ' . $route->arrival_icao);
         } elseif ($validated['action'] === 'invalidate') {
             $route->update(['validated_airac' => null]);
+            log_activity($route, 'Invalidation AIRAC de la ligne ' . $route->departure_icao . ' -> ' . $route->arrival_icao);
         }
 
         return response()->json(['success' => true, 'message' => 'Statut de la route mis à jour.']);

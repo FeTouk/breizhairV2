@@ -67,6 +67,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Vérifie si l'utilisateur a le rôle d'administrateur.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
      * Accessor pour formater le total des heures de vol.
      * Sera accessible via $user->formatted_flight_hours
      */
