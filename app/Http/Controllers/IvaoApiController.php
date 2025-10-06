@@ -6,99 +6,80 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class IvaoApiController extends Controller
 {
-    /**
-     * Récupère les informations du dernier vol d'un utilisateur depuis l'API d'IVAO.
-     */
-    public function getLastFlight()
+    public function getRecentFlights()
     {
         $user = Auth::user();
-        // On vérifie que l'utilisateur a bien un VID et un Callsign enregistrés
-        if (!$user || !$user->ivao_vid || !$user->callsign) {
-            return response()->json(['error' => 'VID IVAO ou Callsign non trouvé sur votre profil.'], 404);
+        if (!$user || !$user->ivao_vid) {
+            return response()->json(['error' => 'VID IVAO non trouvé sur votre profil.'], 404);
+        }
+
+        // Pour ce test, la clé API est en dur. En production, elle devrait venir de config/services.php
+        $apiKey = 'SA9NKSNZMCC9WIB9RC18V5W7H3KOYQTA';
+        
+        if (empty($apiKey) || $apiKey === 'VOTRE_VRAIE_CLE_API_ICI') {
+            Log::error('IVAO API Key is not set directly in the controller for debugging.');
+            return response()->json(['error' => 'La clé d\'API de test n\'est pas configurée dans le contrôleur.'], 500);
         }
 
         $vid = $user->ivao_vid;
-        $callsign = $user->callsign;
-        $whazzupUrl = 'https://api.ivao.aero/v2/tracker/whazzup';
+        $sessionsApiUrl = "https://api.ivao.aero/v2/tracker/sessions?page=1&userId={$vid}";
 
         try {
-            $apiKey = config('services.ivao.api_key');
-            $response = Http::withHeaders(array_filter(['apiKey' => $apiKey]))->get($whazzupUrl);
+            $response = Http::withoutVerifying()
+                            ->withHeaders(['apiKey' => $apiKey])
+                            ->get($sessionsApiUrl);
 
             if ($response->failed()) {
-                return response()->json(['error' => 'Impossible de contacter l\'API IVAO pour le moment.'], 500);
+                Log::error('IVAO Sessions API call failed.', [
+                    'vid' => $vid,
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body(),
+                ]);
+                return response()->json(['error' => 'Impossible de contacter l\'API des sessions IVAO.'], 500);
             }
 
-            $pilots = $response->json()['clients']['pilots'] ?? [];
+            $sessions = $response->json() ?? [];
 
-            // On filtre la liste de tous les pilotes en ligne pour trouver :
-            // 1. Ceux qui correspondent au VID de notre utilisateur.
-            // 2. Parmi ceux-là, celui qui utilise l'indicatif de la compagnie.
-            $userFlight = collect($pilots)
-                ->where('userId', $vid)
-                ->where('callsign', $callsign)
-                ->first(); // On prend le premier (et seul) résultat
-
-            if (!$userFlight) {
-                return response()->json(['error' => 'Aucun vol récent avec votre indicatif BZH trouvé sur le réseau.'], 404);
+            if (empty($sessions)) {
+                return response()->json(['error' => 'Aucune session de vol récente n\'a été trouvée.'], 404);
             }
 
-            $flightPlan = $userFlight['flightPlan'] ?? [];
-            
-            // On formate l'heure de départ prévue (ex: "1830" -> "18:30")
-            $departureTime = isset($flightPlan['departureTime']) ? substr_replace($flightPlan['departureTime'], ':', 2, 0) : '';
+            // On filtre les sessions pour ne garder que celles avec un plan de vol valide
+            $validSessions = collect($sessions)->filter(function ($session) {
+                return !empty($session['flightplan']) && !empty($session['flightplan']['departureId']) && !empty($session['flightplan']['arrivalId']);
+            });
 
-            // On renvoie les données formatées au formulaire
+            if ($validSessions->isEmpty()) {
+                return response()->json(['error' => 'Aucun de vos vols récents ne contenait de plan de vol valide.'], 404);
+            }
+
+            // On formate les données pour qu'elles soient faciles à utiliser
+            $formattedFlights = $validSessions->map(function ($session) {
+                $flightplan = $session['flightplan'];
+                
+                return [
+                    'id' => $session['id'],
+                    'callsign' => $session['callsign'] ?? 'N/A',
+                    // 👇 C'est ici que l'on récupère le code OACI de départ 👇
+                    'departure' => $flightplan['departureId'],
+                    // 👇 Et ici, celui d'arrivée 👇
+                    'arrival' => $flightplan['arrivalId'],
+                ];
+            })->values();
+
             return response()->json([
-                'departure' => $flightPlan['departureId'] ?? '',
-                'arrival' => $flightPlan['arrivalId'] ?? '',
-                'date' => Carbon::parse($userFlight['lastTrack']['date'])->format('Y-m-d'),
-                'route' => $flightPlan['route'] ?? '',
-                'departure_time' => $departureTime,
-                // L'API ne fournit pas l'heure d'arrivée réelle, le pilote devra la remplir.
-                'arrival_time' => '', 
+                'message' => "Nous avons trouvé {$formattedFlights->count()} vol(s) récent(s) avec un plan de vol.",
+                'flights' => $formattedFlights,
             ]);
 
         } catch (\Exception $e) {
-            // En cas d\'erreur inattendue (ex: format de l\'API qui change)
-            return response()->json(['error' => 'Erreur lors de la récupération des données de vol.'], 500);
-        }
-    }
-
-    public function testIvaoVid($vid)
-    {
-        $whazzupUrl = 'https://api.ivao.aero/v2/tracker/whazzup';
-
-        try {
-            $apiKey = config('services.ivao.api_key');
-            $response = Http::withHeaders(array_filter(['apiKey' => $apiKey]))->get($whazzupUrl);
-
-            if ($response->failed()) {
-                return response()->json(['error' => 'Impossible de contacter l\'API IVAO pour le moment.'], 500);
-            }
-
-            $pilots = $response->json()['clients']['pilots'] ?? [];
-
-            $userFlight = collect($pilots)
-                ->where('userId', $vid)
-                ->first();
-
-            if (!$userFlight) {
-                return response()->json(['error' => 'Aucun vol trouvé pour ce VID sur le réseau.'], 404);
-            }
-
-            return response()->json([
-                'vid' => $userFlight['userId'],
-                'callsign' => $userFlight['callsign'],
-                'departure' => $userFlight['flightPlan']['departureId'] ?? '',
-                'arrival' => $userFlight['flightPlan']['arrivalId'] ?? '',
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la récupération des données de vol.', 'message' => $e->getMessage()], 500);
+            Log::error('IVAO Sessions API Exception', ['message' => $e->getMessage()]);
+            return response()->json(['error' => 'Erreur lors de la récupération des données des sessions.'], 500);
         }
     }
 }
+

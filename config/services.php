@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // 👇 On ajoute la configuration pour la clé d'API IVAO 👇
+    'ivao' => [
+        'api_key' => env('IVAO_API_KEY'),
+    ],
+
 ];
+

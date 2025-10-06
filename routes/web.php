@@ -100,7 +100,9 @@ Route::middleware(['auth', 'verified', 'test.passed'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/test-entree', [TestController::class, 'show'])->name('test.show');
     Route::post('/verif-test', [TestController::class, 'verify'])->name('test.verify');
-    Route::get('/api/ivao/last-flight', [IvaoApiController::class, 'getLastFlight'])->name('api.ivao.last-flight');
+    
+    Route::get('/api/ivao/recent-flights', [IvaoApiController::class, 'getRecentFlights'])->name('api.ivao.recent-flights');
+    
     Route::get('/api/skyvector/distance', [SkyVectorApiController::class, 'getDistance'])->name('api.skyvector.distance');
 
     // Section réservée uniquement aux Administrateurs
@@ -110,18 +112,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/flights/{flight}', [FlightValidationController::class, 'show'])->name('flights.validation.show');
         Route::patch('/admin/flights/{flight}', [FlightValidationController::class, 'update'])->name('flights.validation.update');
         
-        // Routes de gestion des pilotes
         Route::resource('pilots', PilotManagementController::class)->except(['create', 'store']);
         Route::patch('/pilots/{pilot}/skycoins', [PilotManagementController::class, 'updateSkycoins'])->name('pilots.skycoins.update');
         
-        // Routes de gestion des routes
         Route::resource('admin/routes', RouteManagementController::class)->names('admin.routes');
         Route::patch('/admin/routes/{route}/airac', [RouteManagementController::class, 'updateAirac'])->name('admin.routes.updateAirac');
         
-        // Routes de gestion des événements
         Route::resource('admin/events', EventManagementController::class)->names('admin.events');
 
-        // Route pour l'affichage des logs
         Route::get('/admin/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
     });
 });
@@ -133,3 +131,4 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
+
