@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    {{-- On initialise Alpine.js pour gérer le popup, les données du formulaire et les messages de l'API --}}
-    <div class="py-12" x-data="{ openModal: false, formData: { departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '' }, apiMessage: null }">
+    {{-- On initialise Alpine.js avec une fonction dédiée pour gérer la logique du formulaire --}}
+    <div class="py-12" x-data="flightReportForm()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
             {{-- Bloc Titre et Description --}}
@@ -21,30 +21,11 @@
                     Pour un meilleur tracking de la VA par IVAO, pensez à inscrire <code class="bg-gray-200 text-red-600 font-mono p-1 rounded">IVAOVA/BZH</code> dans l'item 18 (Remarques) de votre plan de vol.
                 </p>
                 <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button 
-                        @click="
-                            openModal = true;
-                            apiMessage = 'Recherche de votre dernier vol...';
-                            formData = { departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '' }; // On réinitialise le formulaire
-                            fetch('{{ route('api.ivao.last-flight') }}')
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.error) {
-                                        apiMessage = data.error + ' Veuillez remplir le formulaire manuellement.';
-                                    } else {
-                                        apiMessage = 'Dernier vol trouvé et pré-rempli !';
-                                        formData.departure = data.departure;
-                                        formData.arrival = data.arrival;
-                                        formData.date = data.date;
-                                        formData.route = data.route;
-                                        formData.departure_time = data.departure_time;
-                                        formData.arrival_time = data.arrival_time;
-                                    }
-                                });"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-center">
+                    {{-- Le bouton appelle maintenant la fonction d'initialisation d'Alpine.js --}}
+                    <button @click="openModalAndFetchFlights()" class="btn btn-primary">
                         Envoyer un rapport de vol libre
                     </button>
-                    <a href="#" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-center">
+                    <a href="#" class="btn">
                         Envoyer un rapport de ligne
                     </a>
                 </div>
@@ -76,7 +57,6 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Départ</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrivée</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance (NM)</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Temps de vol</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
@@ -88,15 +68,14 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ \Carbon\Carbon::parse($flight->flight_date)->format('d/m/Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{{ $flight->departure_icao }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">{{ $flight->arrival_icao }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $flight->nautical_miles }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $flight->formatted_duration }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if ($flight->status == 'Validé')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Validé</span>
+                                            <span class="badge badge-success text-white">Validé</span>
                                         @elseif ($flight->status == 'En attente')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En attente</span>
+                                            <span class="badge badge-warning text-white">En attente</span>
                                         @else
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Refusé</span>
+                                            <span class="badge badge-error text-white">Refusé</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -105,7 +84,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                         Vous n'avez pas encore enregistré de vol.
                                     </td>
                                 </tr>
@@ -117,72 +96,140 @@
         </div>
 
         {{-- MODAL (POPUP) POUR LE RAPPORT DE VOL --}}
-        <div x-show="openModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;">
-            <div @click.away="openModal = false" class="bg-white rounded-lg shadow-2xl w-full max-w-2xl p-8 relative">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Rapport de Vol Libre</h2>
+        <div class="modal" :class="{'modal-open': openModal}">
+            <div class="modal-box w-11/12 max-w-2xl">
+                <h2 class="font-bold text-lg mb-4">Rapport de Vol Libre</h2>
                 
-                <div x-show="apiMessage"
-                     :class="{ 
-                         'bg-blue-100 text-blue-800': apiMessage && !apiMessage.includes('manuellement'), 
-                         'bg-yellow-100 text-yellow-800': apiMessage && apiMessage.includes('manuellement') 
-                     }"
-                     class="p-4 rounded-md text-sm mb-4" 
-                     x-text="apiMessage">
+                <div x-show="apiMessage" class="alert mb-4" :class="{ 'alert-info': !apiError, 'alert-warning': apiError }">
+                    <div x-text="apiMessage"></div>
                 </div>
 
                 <form action="{{ route('flight-report.store') }}" method="POST">
                     @csrf
                     <div class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="departure_icao" class="block text-sm font-medium text-gray-700">Départ (OACI)</label>
-                                <input type="text" name="departure_icao" id="departure_icao" x-model="formData.departure" required maxlength="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm uppercase">
-                            </div>
-                            <div>
-                                <label for="arrival_icao" class="block text-sm font-medium text-gray-700">Arrivée (OACI)</label>
-                                <input type="text" name="arrival_icao" id="arrival_icao" x-model="formData.arrival" required maxlength="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm uppercase">
-                            </div>
+                        <div x-show="recentFlights.length > 0">
+                            <label class="label"><span class="label-text">Importer un vol récent</span></label>
+                            <select @change="selectFlight($event.target.value)" class="select select-bordered w-full">
+                                <option value="">Remplir manuellement</option>
+                                <template x-for="flight in recentFlights" :key="flight.id">
+                                    <option :value="flight.id" x-text="`${flight.departure} -> ${flight.arrival} (${flight.callsign})`"></option>
+                                </template>
+                            </select>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="departure_time" class="block text-sm font-medium text-gray-700">Heure de départ (HH:MM)</label>
-                                <input type="time" name="departure_time" id="departure_time" x-model="formData.departure_time" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <label class="label"><span class="label-text">Départ (OACI)</span></label>
+                                <input type="text" name="departure_icao" required x-model="formData.departure" class="input input-bordered w-full uppercase">
                             </div>
                             <div>
-                                <label for="arrival_time" class="block text-sm font-medium text-gray-700">Heure d'arrivée (HH:MM)</label>
-                                <input type="time" name="arrival_time" id="arrival_time" x-model="formData.arrival_time" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <label class="label"><span class="label-text">Arrivée (OACI)</span></label>
+                                <input type="text" name="arrival_icao" required x-model="formData.arrival" class="input input-bordered w-full uppercase">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <div>
+                                <label class="label"><span class="label-text">Heure de départ (HH:MM)</span></label>
+                                <input type="time" name="departure_time" required x-model="formData.departure_time" class="input input-bordered w-full">
+                            </div>
+                            <div>
+                                <label class="label"><span class="label-text">Heure d'arrivée (HH:MM)</span></label>
+                                <input type="time" name="arrival_time" required x-model="formData.arrival_time" class="input input-bordered w-full">
                             </div>
                         </div>
                         <div>
-                            <label for="flight_date" class="block text-sm font-medium text-gray-700">Date du vol</label>
-                            <input type="date" name="flight_date" id="flight_date" x-model="formData.date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            <label class="label"><span class="label-text">Date du vol</span></label>
+                            <input type="date" name="flight_date" required x-model="formData.date" class="input input-bordered w-full">
                         </div>
                         <div>
-                            <label for="route" class="block text-sm font-medium text-gray-700">Route du plan de vol (facultatif)</label>
-                            <textarea name="route" id="route" x-model="formData.route" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono uppercase"></textarea>
+                            <label class="label"><span class="label-text">Route</span></label>
+                            <textarea name="route" rows="3" x-model="formData.route" class="textarea textarea-bordered w-full font-mono uppercase"></textarea>
                         </div>
                         <div>
-                            <label for="comments" class="block text-sm font-medium text-gray-700">Commentaire (facultatif)</label>
-                            <textarea name="comments" id="comments" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                            <label class="label"><span class="label-text">Commentaire (facultatif)</span></label>
+                            <textarea name="comments" id="comments" rows="3" class="textarea textarea-bordered w-full"></textarea>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <div class="flex items-center">
-                                <input id="is_breizhair_event" name="is_breizhair_event" type="checkbox" value="1" class="h-4 w-4 rounded border-gray-300 text-blue-600">
-                                <label for="is_breizhair_event" class="ml-2 block text-sm text-gray-900">Evènement Breizh'Air</label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="is_ivao_event" name="is_ivao_event" type="checkbox" value="1" class="h-4 w-4 rounded border-gray-300 text-blue-600">
-                                <label for="is_ivao_event" class="ml-2 block text-sm text-gray-900">Evènement IVAO</label>
-                            </div>
+                            <label class="label cursor-pointer"><input type="checkbox" name="is_breizhair_event" value="1" class="checkbox checkbox-primary" /> <span class="label-text ml-2">Evènement Breizh'Air</span></label>
+                            <label class="label cursor-pointer"><input type="checkbox" name="is_ivao_event" value="1" class="checkbox checkbox-primary" /> <span class="label-text ml-2">Evènement IVAO</span></label>
                         </div>
                     </div>
-                    <div class="mt-6 flex justify-end gap-4">
-                        <button type="button" @click="openModal = false" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">Annuler</button>
-                        <button type="submit" class="bg-[#17A4F6] hover:bg-[#138fd9] text-white font-bold py-2 px-4 rounded-lg">Envoyer le rapport</button>
+                    <div class="modal-action">
+                        <button type="button" @click="openModal = false" class="btn">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    {{-- Script Alpine.js pour la logique du formulaire --}}
+    <script>
+        function flightReportForm() {
+            return {
+                openModal: false,
+                apiMessage: null,
+                apiError: false,
+                recentFlights: [],
+                formData: {
+                    departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '',
+                },
+
+                openModalAndFetchFlights() {
+                    this.openModal = true;
+                    this.apiMessage = 'Recherche de vos vols récents...';
+                    this.apiError = false;
+                    this.recentFlights = [];
+                    this.resetForm();
+
+                    fetch('{{ route("api.ivao.recent-flights") }}')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                this.apiMessage = data.error + ' Veuillez remplir le formulaire manuellement.';
+                                this.apiError = true;
+                            } else {
+                                this.apiMessage = data.message;
+                                this.recentFlights = data.flights;
+                                this.apiError = (this.recentFlights.length === 0);
+
+                                if (!this.apiError) {
+                                    this.apiMessage += " Le plus récent a été pré-rempli.";
+                                    this.selectFlight(this.recentFlights[0].id);
+                                } else {
+                                    this.apiMessage = 'Aucun vol avec plan de vol trouvé. Veuillez remplir le formulaire manuellement.';
+                                }
+                            }
+                        })
+                        .catch(() => {
+                            this.apiMessage = 'Erreur de communication avec l\'API. Veuillez remplir le formulaire manuellement.';
+                            this.apiError = true;
+                        });
+                },
+
+                selectFlight(flightId) {
+                    if (!flightId) {
+                        this.resetForm();
+                        return;
+                    }
+                    const selected = this.recentFlights.find(f => f.id == flightId);
+                    if (selected) {
+                        this.formData.departure = selected.departure;
+                        this.formData.arrival = selected.arrival;
+                        this.formData.date = selected.flight_date;
+                        this.formData.route = selected.route;
+                        this.formData.departure_time = selected.departure_time;
+                        this.formData.arrival_time = selected.arrival_time;
+                    }
+                },
+
+                resetForm() {
+                    this.formData = { departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '' };
+                }
+            }
+        }
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('flightReportForm', flightReportForm);
+        });
+    </script>
 </x-app-layout>
 
