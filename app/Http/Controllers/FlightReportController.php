@@ -16,6 +16,7 @@ class FlightReportController extends Controller
         $validatedData = $request->validate([
             'departure_icao' => 'required|string|alpha|size:4',
             'arrival_icao' => 'required|string|alpha|size:4',
+            'flight_date' => 'required|date',
             'comments' => 'nullable|string',
             'is_breizhair_event' => 'nullable|boolean',
             'is_ivao_event' => 'nullable|boolean',
@@ -25,12 +26,11 @@ class FlightReportController extends Controller
             'user_id' => Auth::id(),
             'departure_icao' => strtoupper($validatedData['departure_icao']),
             'arrival_icao' => strtoupper($validatedData['arrival_icao']),
+            'flight_date' => $validatedData['flight_date'],
             'comments' => $validatedData['comments'],
             'is_breizhair_event' => $request->has('is_breizhair_event'),
             'is_ivao_event' => $request->has('is_ivao_event'),
             'status' => 'En attente',
-            // On définit la date du vol à la date du jour par défaut
-            'flight_date' => now(), 
         ]);
 
         return redirect()->route('flights.index')->with('success', 'Votre rapport de vol a bien été envoyé et est en attente de validation.');

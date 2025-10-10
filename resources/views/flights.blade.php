@@ -95,9 +95,9 @@
             </div>
         </div>
 
-        {{-- MODAL (POPUP) POUR LE RAPPORT DE VOL (VERSION SIMPLIFIÉE) --}}
+        {{-- MODAL (POPUP) POUR LE RAPPORT DE VOL --}}
         <div class="modal" :class="{'modal-open': openModal}">
-            <div class="modal-box w-11/12 max-w-lg">
+            <div class="modal-box w-11/12 max-w-2xl">
                 <h2 class="font-bold text-lg mb-4">Rapport de Vol Libre</h2>
                 
                 <div x-show="apiMessage" class="alert mb-4" :class="{ 'alert-info': !apiError, 'alert-warning': apiError }">
@@ -126,7 +126,24 @@
                                 <input type="text" name="arrival_icao" required x-model="formData.arrival" class="input input-bordered w-full uppercase">
                             </div>
                         </div>
-                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <div>
+                                <label class="label"><span class="label-text">Heure de départ (HH:MM)</span></label>
+                                <input type="time" name="departure_time" required x-model="formData.departure_time" class="input input-bordered w-full">
+                            </div>
+                            <div>
+                                <label class="label"><span class="label-text">Heure d'arrivée (HH:MM)</span></label>
+                                <input type="time" name="arrival_time" required x-model="formData.arrival_time" class="input input-bordered w-full">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="label"><span class="label-text">Date du vol</span></label>
+                            <input type="date" name="flight_date" required x-model="formData.date" class="input input-bordered w-full">
+                        </div>
+                        <div>
+                            <label class="label"><span class="label-text">Route</span></label>
+                            <textarea name="route" rows="3" x-model="formData.route" class="textarea textarea-bordered w-full font-mono uppercase"></textarea>
+                        </div>
                         <div>
                             <label class="label"><span class="label-text">Commentaire (facultatif)</span></label>
                             <textarea name="comments" id="comments" rows="3" class="textarea textarea-bordered w-full"></textarea>
@@ -145,7 +162,7 @@
         </div>
     </div>
 
-    {{-- Script Alpine.js pour la logique du formulaire (VERSION SIMPLIFIÉE) --}}
+    {{-- Script Alpine.js pour la logique du formulaire --}}
     <script>
         function flightReportForm() {
             return {
@@ -154,9 +171,9 @@
                 apiError: false,
                 recentFlights: [],
                 formData: {
-                    departure: '', 
-                    arrival: '',
+                    departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '',
                 },
+
                 openModalAndFetchFlights() {
                     this.openModal = true;
                     this.apiMessage = 'Recherche de vos vols récents...';
@@ -174,8 +191,12 @@
                                 this.apiMessage = data.message;
                                 this.recentFlights = data.flights;
                                 this.apiError = (this.recentFlights.length === 0);
-                                if(this.apiError && !data.error) {
-                                    this.apiMessage += ' Veuillez remplir le formulaire manuellement.';
+
+                                if (!this.apiError) {
+                                    this.apiMessage += " Le plus récent a été pré-rempli.";
+                                    this.selectFlight(this.recentFlights[0].id);
+                                } else {
+                                    this.apiMessage = 'Aucun vol avec plan de vol trouvé. Veuillez remplir le formulaire manuellement.';
                                 }
                             }
                         })
@@ -184,6 +205,7 @@
                             this.apiError = true;
                         });
                 },
+
                 selectFlight(flightId) {
                     if (!flightId) {
                         this.resetForm();
@@ -193,10 +215,15 @@
                     if (selected) {
                         this.formData.departure = selected.departure;
                         this.formData.arrival = selected.arrival;
+                        this.formData.date = selected.flight_date;
+                        this.formData.route = selected.route;
+                        this.formData.departure_time = selected.departure_time;
+                        this.formData.arrival_time = selected.arrival_time;
                     }
                 },
+
                 resetForm() {
-                    this.formData = { departure: '', arrival: '' };
+                    this.formData = { departure: '', arrival: '', date: '', route: '', departure_time: '', arrival_time: '' };
                 }
             }
         }

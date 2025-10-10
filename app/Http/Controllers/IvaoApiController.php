@@ -17,12 +17,10 @@ class IvaoApiController extends Controller
             return response()->json(['error' => 'VID IVAO non trouvé sur votre profil.'], 404);
         }
 
-        // Pour ce test, la clé API est en dur. En production, elle devrait venir de config/services.php
-        $apiKey = 'SA9NKSNZMCC9WIB9RC18V5W7H3KOYQTA';
-        
-        if (empty($apiKey) || $apiKey === 'VOTRE_VRAIE_CLE_API_ICI') {
-            Log::error('IVAO API Key is not set directly in the controller for debugging.');
-            return response()->json(['error' => 'La clé d\'API de test n\'est pas configurée dans le contrôleur.'], 500);
+        $apiKey = config('services.ivao.api_key');
+        if (!$apiKey) {
+            Log::error('IVAO API Key is not configured in .env file.');
+            return response()->json(['error' => 'La clé d\'API IVAO n\'est pas configurée.'], 500);
         }
 
         $vid = $user->ivao_vid;
@@ -34,15 +32,13 @@ class IvaoApiController extends Controller
                             ->get($sessionsApiUrl);
 
             if ($response->failed()) {
-                Log::error('IVAO Sessions API call failed.', [
-                    'vid' => $vid,
-                    'status_code' => $response->status(),
-                    'response_body' => $response->body(),
-                ]);
+                Log::error('IVAO Sessions API call failed.', ['vid' => $vid, 'status_code' => $response->status(), 'response_body' => $response->body()]);
                 return response()->json(['error' => 'Impossible de contacter l\'API des sessions IVAO.'], 500);
             }
 
-            $sessions = $response->json() ?? [];
+            // 👇 CORRECTION 1 : On récupère les données depuis la clé "items" 👇
+            $sessions = $response->json()['items'] ?? [];
+            Log::info('IVAO Sessions API Response for VID ' . $vid, $sessions);
 
             if (empty($sessions)) {
                 return response()->json(['error' => 'Aucune session de vol récente n\'a été trouvée.'], 404);
@@ -50,7 +46,8 @@ class IvaoApiController extends Controller
 
             // On filtre les sessions pour ne garder que celles avec un plan de vol valide
             $validSessions = collect($sessions)->filter(function ($session) {
-                return !empty($session['flightplan']) && !empty($session['flightplan']['departureId']) && !empty($session['flightplan']['arrivalId']);
+                // 👇 CORRECTION 2 : On vérifie si le tableau "flightPlans" n'est pas vide 👇
+                return !empty($session['flightPlans']) && !empty($session['flightPlans'][0]['departureId']) && !empty($session['flightPlans'][0]['arrivalId']);
             });
 
             if ($validSessions->isEmpty()) {
@@ -59,15 +56,20 @@ class IvaoApiController extends Controller
 
             // On formate les données pour qu'elles soient faciles à utiliser
             $formattedFlights = $validSessions->map(function ($session) {
-                $flightplan = $session['flightplan'];
-                
+                // 👇 CORRECTION 3 : On prend le premier plan de vol du tableau 👇
+                $flightplan = $session['flightPlans'][0];
+                $departureTimestamp = $session['createdAt'] ?? null;
+                $arrivalTimestamp = $session['completedAt'] ?? null;
+
                 return [
                     'id' => $session['id'],
                     'callsign' => $session['callsign'] ?? 'N/A',
-                    // 👇 C'est ici que l'on récupère le code OACI de départ 👇
                     'departure' => $flightplan['departureId'],
-                    // 👇 Et ici, celui d'arrivée 👇
                     'arrival' => $flightplan['arrivalId'],
+                    'departure_time' => $departureTimestamp ? Carbon::parse($departureTimestamp)->format('H:i') : '',
+                    'arrival_time' => $arrivalTimestamp ? Carbon::parse($arrivalTimestamp)->format('H:i') : '',
+                    'flight_date' => $departureTimestamp ? Carbon::parse($departureTimestamp)->format('Y-m-d') : '',
+                    'route' => $flightplan['route'] ?? '',
                 ];
             })->values();
 

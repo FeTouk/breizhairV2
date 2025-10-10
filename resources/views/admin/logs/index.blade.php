@@ -25,7 +25,7 @@
                                             {{ $activity->created_at->format('d/m/Y H:i') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $activity->user->name ?? 'Système' }}
+                                            {{ $activity->user->first_name ?? 'Système' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{ $activity->action }}
